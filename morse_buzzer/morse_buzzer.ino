@@ -85,7 +85,7 @@ void setup() {
 void loop() {
     if (Serial.available()) {
         String input = Serial.readStringUntil('\n');
-        inpupt.trim(); // 입력 문자열의 앞뒤 공백 제거
+        input.trim(); // 입력 문자열의 앞뒤 공백 제거
 
         if (input.length() > 0) {
             Serial.print("Playing Morse Code for: ");
