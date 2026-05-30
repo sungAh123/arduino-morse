@@ -1,0 +1,8 @@
+# dependenies
+node_modules/
+
+# build output
+build/
+
+# VS Code
+.vscode/
