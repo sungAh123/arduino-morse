@@ -7,7 +7,7 @@ export default function SerialController({
 
     useEffect(() => {
         onGetPorts();
-    }, []);
+    }, [onGetPorts]);
 
     const handleConnect = () => {
         if (selectedPort) {

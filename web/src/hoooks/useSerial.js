@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { calcMorseDuration } from '../utils/morseConverter';
 
 export function useSerial() {
@@ -8,7 +8,7 @@ export function useSerial() {
 
     const API_URL = 'http://localhost:5000/api';
 
-    const getPorts = async () => {
+    const getPorts = useCallback(async () => {
         try {
             const res = await fetch(`${API_URL}/ports`);
             const data = await res.json();
@@ -17,8 +17,8 @@ export function useSerial() {
         } catch (error) {
             setStatus('Failed to fetch ports' + error.message);
         }
-    };
-
+    }, []);
+    
     const connect = async (portPath) => {
         try {
             const res = await fetch(`${API_URL}/connect`, {
