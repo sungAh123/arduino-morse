@@ -1,4 +1,5 @@
 #define BUZZER_PIN 8
+#define LED_PIN 13
 
 // 타이밍(단위: ms)
 #define DOT_DURATION 150    // 점의 길이
@@ -21,15 +22,19 @@ const char* morseCodeDigits[] = {
 
 void dot() {
     tone(BUZZER_PIN, 800); // 800 Hz
+    digitalWrite(LED_PIN, HIGH);
     delay(DOT_DURATION);
     noTone(BUZZER_PIN);
+    digitalWrite(LED_PIN, LOW);
     delay(GAP_DURATION);
 }
 
 void dash() {
     tone(BUZZER_PIN, 800); // 800 Hz
+    digitalWrite(LED_PIN, HIGH);
     delay(DASH_DURATION);
     noTone(BUZZER_PIN);
+    digitalWrite(LED_PIN, LOW);
     delay(GAP_DURATION);
 }
 
