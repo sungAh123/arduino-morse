@@ -1,0 +1,14 @@
+{
+  "name": "morse-buzzer-server",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "serialport": "^13.0.0",
+    "body-parser": "^1.20.2"
+  }
+}
