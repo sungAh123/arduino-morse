@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { calcMorseDuration } from '../utils/morseConverter';
 
 export function useSerial() {
     const [connected, setConnected] = useState(false);
@@ -68,15 +69,14 @@ export function useSerial() {
             const data = await res.json();
 
             if (res.ok) {
-                setStatus('Message sent: ' + text);
+                const duration = calcMorseDuration(text);
+                setStatus('Message sent [' + text + ']');
+                setTimeout(() => {
+                    setStatus('Connected');
+                }, duration);
             } else {
                 setStatus('Send failed: ' + data.error);
             }
-
-            // 5초 뒤 다시 연결됨으로 상태 변경
-            setTimeout(() => {
-                setStatus('Connected');
-            }, 5000);
         } catch (error) {
             setStatus('Send failed' + error.message);
         }
