@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import { useState } from 'react';
 import { useSerial } from './hoooks/useSerial';
 import { toMorse } from './utils/morseConverter';
 import InputPanel from './components/InputPanel';
@@ -7,7 +7,7 @@ import SerialController from './components/SerialController';
 
 export default function App() {
     const [morse, setMorse] = useState('');
-    const { connected, status, connect, disconnect, send } = useSerial();
+    const { connected, status, ports, getPorts, connect, disconnect, send } = useSerial();
 
     const handleSend = (text) => {
         const morseText = toMorse(text);
@@ -23,8 +23,10 @@ export default function App() {
             <SerialController 
                 connected={connected}
                 status={status}
+                ports={ports}
                 onConnect={connect}
                 onDisconnect={disconnect}
+                onGetPorts={getPorts}
             />
             <InputPanel onSend={handleSend} />
             <MorsePreview morse={morse} />
