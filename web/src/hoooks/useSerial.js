@@ -1,19 +1,38 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 
 export function useSerial() {
     const [connected, setConnected] = useState(false);
     const [status, setStatus] = useState('Disconnected');
-    const portRef = useRef(null);
-    const writerRef = useRef(null);
+    const [ports, setPorts] = useState([]);
 
-    const connect = async () => {
+    const API_URL = 'http://localhost:5000/api';
+
+    const getPorts = async () => {
         try {
-            const port = await navigator.serial.requestPort();
-            await port.open({ baudRate: 9600 });
-            portRef.current = port;
-            writerRef.current = port.writable.getWriter();
-            setConnected(true);
-            setStatus('Connected');
+            const res = await fetch(`${API_URL}/ports`);
+            const data = await res.json();
+            setPorts(data);
+            return data;
+        } catch (error) {
+            setStatus('Failed to fetch ports' + error.message);
+        }
+    };
+
+    const connect = async (portPath) => {
+        try {
+            const res = await fetch(`${API_URL}/connect`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ portPath, baudRate: 9600 }),
+            });
+            const data = await res.json();
+
+            if (res.ok) {
+                setConnected(true);
+                setStatus('Connected');
+            } else {
+                setStatus('Connection failed: ' + data.error);
+            }
         } catch (error) {
             setStatus('Connection failed' + error.message);
         }
@@ -21,21 +40,38 @@ export function useSerial() {
 
     const disconnect = async () => {
         try {
-            writerRef.current?.releaseLock();
-            await portRef.current?.close();
-            setConnected(false);
-            setStatus('Disconnected');
+            const res = await fetch(`${API_URL}/disconnect`, { method: 'POST' });
+            const data = await res.json();
+
+            if (res.ok) {
+                setConnected(false);
+                setStatus('Disconnected');
+            } else {
+                setStatus('Disconnection failed: ' + data.error);
+            }
         } catch (error) {
             setStatus('Disconnection failed' + error.message);
         }
     };
 
     const send = async (text) => {
-        if (!writerRef.current) return;
+        if (!connected) {
+            setStatus('Not connected to Arduino');
+            return; 
+        }
         try {
-            const encoder = new TextEncoder();
-            await writerRef.current.write(encoder.encode(text + '\n'));
-            setStatus('Message sent' + text);
+           const res = await fetch(`${API_URL}/send`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text }),
+            });
+            const data = await res.json();
+
+            if (res.ok) {
+                setStatus('Message sent: ' + text);
+            } else {
+                setStatus('Send failed: ' + data.error);
+            }
 
             // 5초 뒤 다시 연결됨으로 상태 변경
             setTimeout(() => {
@@ -46,5 +82,5 @@ export function useSerial() {
         }
     };
 
-    return { connected, status, connect, disconnect, send };
+    return { connected, status, ports, getPorts, connect, disconnect, send };
 }
